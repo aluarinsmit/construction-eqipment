@@ -1,0 +1,357 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Interactive Construction Equipment Guide</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        body {
+            font-family: 'Inter', sans-serif; /* Assuming Inter is loaded or falls back to sans-serif */
+        }
+        .content-section { display: none; }
+        .content-section.active { display: block; }
+        .equipment-card {
+            transition: all 0.3s ease-in-out;
+        }
+        .equipment-details {
+            max-height: 0;
+            overflow: hidden;
+            transition: max-height 0.5s ease-in-out, padding 0.5s ease-in-out;
+        }
+        .equipment-details.open {
+            max-height: 2000px; /* Adjust as needed for content */
+            padding-top: 0.5rem;
+            padding-bottom: 0.5rem;
+        }
+        .sidebar-icon {
+            width: 1.5em;
+            text-align: center;
+        }
+         /* Custom scrollbar for webkit browsers */
+        ::-webkit-scrollbar {
+            width: 8px;
+            height: 8px;
+        }
+        ::-webkit-scrollbar-track {
+            background: #f1f1f1;
+            border-radius: 10px;
+        }
+        ::-webkit-scrollbar-thumb {
+            background: #cbd5e1; /* Tailwind gray-300 */
+            border-radius: 10px;
+        }
+        ::-webkit-scrollbar-thumb:hover {
+            background: #94a3b8; /* Tailwind gray-400 */
+        }
+    </style>
+</head>
+<body class="bg-stone-50 text-neutral-800 flex min-h-screen">
+
+    <aside id="sidebar" class="bg-slate-800 text-stone-200 w-64 space-y-2 py-7 px-2 fixed inset-y-0 left-0 transform -translate-x-full md:relative md:translate-x-0 transition-transform duration-200 ease-in-out z-30 shadow-lg overflow-y-auto">
+        <h1 class="text-2xl font-bold text-white px-4 mb-5 text-center">Equipment Guide</h1>
+        <nav id="navigationMenu">
+            </nav>
+    </aside>
+
+    <button id="mobileMenuButton" class="md:hidden fixed top-4 left-4 z-40 p-2 bg-slate-800 text-white rounded-md">
+        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-6 h-6">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M3.75 6.75h16.5M3.75 12h16.5m-16.5 5.25h16.5" />
+        </svg>
+    </button>
+
+    <main class="flex-1 p-6 md:p-10 overflow-y-auto">
+        <div id="contentArea" class="max-w-5xl mx-auto">
+            </div>
+    </main>
+
+    <script>
+        const equipmentData = [
+            {
+                id: "overview",
+                navTitle: "Overview",
+                icon: '📖',
+                title: "Construction Equipment: An Overview",
+                content: `
+                    <div class="space-y-4">
+                        <p class="text-lg">This guide provides an overview of various types of construction equipment, categorized for easy understanding. Construction equipment is vital for efficiency, speed, quality, and safety in civil engineering and construction projects. It's used in diverse applications like earthwork, building construction, road construction, mining, and more.</p>
+                        <h3 class="text-xl font-semibold text-teal-700 mt-6">Key Categories Covered:</h3>
+                        <ul class="list-disc list-inside space-y-1 pl-4">
+                            <li>Earth Moving Equipment</li>
+                            <li>Compaction Equipment</li>
+                            <li>Leveling Equipment</li>
+                            <li>Paving Equipment</li>
+                            <li>Lifting Equipment</li>
+                            <li>Transporting Equipment</li>
+                            <li>Processing Plants</li>
+                        </ul>
+                        <p class="mt-4 text-sm text-neutral-600"><em>Navigate using the sidebar to explore each category in detail.</em></p>
+                        <p class="mt-2 text-xs text-neutral-500">Presentation by: [Your Name/Organization] | Date: [Date]</p>
+                    </div>
+                `
+            },
+            {
+                id: "earthMoving",
+                navTitle: "Earth Moving",
+                icon: '🚜',
+                title: "Earth Moving Equipment",
+                subtitle: "Shaping the Landscape",
+                introduction: "Designed for excavating, grading, hauling, and processing earth and rock. Crucial for site preparation, road construction, mining, and large-scale earthworks.",
+                types: [
+                    {
+                        name: "Dozers",
+                        summary: "Powerful tracked machines with a large metal blade for pushing soil, sand, or rubble.",
+                        variants: [
+                            { title: "Bulldozer (Straight Blade Dozer)", content: "Blade: Straight (S-blade) or universal (U-blade). Use: Pushing material straight. Applications: Fine grading, ditching, short-distance material movement, stripping topsoil." },
+                            { title: "Angle Dozer", content: "Blade: Angle (A-blade), angles horizontally. Use: Pushing material to the side (side-casting). Applications: Windrows, backfilling, side-hill cutting, snow removal." },
+                            { title: "Tree Dozer", content: "Design: Modified for land clearing. Features: Heavy-duty V-shaped blade, robust guarding. Applications: Clearing forests for construction, agriculture." }
+                        ]
+                    },
+                    { name: "Scrapers (Motor Scrapers / Wheeled Tractor-Scrapers)", content: "Function: Cutting, loading, hauling, and dumping loose materials over medium/long distances. Operation: Sharp cutting edge digs, material collected in a hopper, transported, and ejected. Types: Single-engine (pusher dozer often needed), Twin-engine (push-pull for self-loading). Applications: Large-scale earthmoving, road/airport construction, land leveling." },
+                    { name: "Loaders (Wheel Loaders / Track Loaders)", content: "Function: Scooping, lifting, carrying, and loading materials (soil, gravel, sand, debris) into trucks or hoppers. Components: Front-mounted bucket, lift arms. Types: Wheel Loaders (mobile, fast, for hard surfaces), Track Loaders (better traction on soft/uneven terrain). Applications: Material handling, loading, site cleanup, light excavation." },
+                    { name: "Excavators (Hydraulic Excavators)", content: "Function: Digging, trenching, material handling, demolition, heavy lifting. Components: Boom, dipper (stick), bucket, cab on a rotating platform. Mobility: Tracked (crawler) or wheeled. Attachments: Breakers, grapples, augers. Applications: Foundation digging, utility trenching, mining, dredging, demolition." },
+                    { name: "Draglines", content: "Function: Large-scale excavation for surface mining, canal dredging. Operation: Large bucket suspended from a boom with wire ropes, dragged to excavate. Types: Walking Draglines (very large, move on 'feet'), Crawler-mounted Draglines (smaller, mobile). Advantages: Long reach, deep digging." },
+                    { name: "Clamshells", content: "Function: Vertical digging, lifting, handling loose materials. Mechanism: Two hinged 'shells' form a grabbing bucket (cable or hydraulic). Mounting: On cranes or excavators. Applications: Deep pits, foundations, dredging, loading/unloading barges, confined space material transfer." },
+                    { name: "Trench Diggers (Trenchers)", content: "Function: Specialized for excavating trenches (pipes, cables, drainage). Types: Chain Trenchers (digging chain), Wheel Trenchers (Rockwheels - toothed metal wheel for hard ground), Micro-Trenchers (small, shallow trenches). Advantages: Faster, more precise for trenching than general excavators." }
+                ]
+            },
+            {
+                id: "compaction",
+                navTitle: "Compaction",
+                icon: '🧱',
+                title: "Compaction Equipment",
+                subtitle: "Building a Solid Foundation",
+                introduction: "To increase the density of soil or other materials by expelling air and water. Improves load-bearing capacity, stability, and reduces settlement.",
+                types: [
+                    { name: "Smooth Wheel Rollers (Static/Vibratory)", content: "Description: One or more large, smooth steel drums. Types: Static (dead weight), Vibratory (dynamic force via vibration). Applications: Compacting granular soils (sand, gravel), asphalt layers. Not ideal for cohesive soils." },
+                    { name: "Vibrating Rollers", content: "Mechanism: Vibrating drum(s) apply dynamic loads, rearranging particles for density. Versatility: Effective for granular/mixed soils and asphalt. Types: Single-drum (soil), tandem-drum (asphalt). Advantages: Higher compaction faster than static." },
+                    { name: "Pneumatic Tyred Rollers", content: "Description: Several rows of overlapping rubber tires. Action: Kneading effect for granular/cohesive soils and asphalt. Advantages: Seals surfaces, improves density/stability. Tire pressure adjustable. Applications: Subgrades, bases, asphalt wearing courses." },
+                    { name: "Sheepsfoot Rollers (Tamping Foot Rollers)", content: "Description: Steel drum with projecting 'feet'. Action: Feet penetrate soil, tamping/kneading from bottom up. Applications: Cohesive soils (clay, silty clay) for embankments, dams, subgrades. Note: Leaves loose surface layer." },
+                    { name: "Rammers (Tampers / Jumping Jacks)", content: "Description: Manually operated or machine-mounted impact devices. Mechanism: High-impact blows. Types: Manual (Jumping Jacks - small/confined areas), Machine-Mounted (excavators - larger areas/force). Applications: Trenches, foundations, backfills, confined spaces." }
+                ]
+            },
+            {
+                id: "leveling",
+                navTitle: "Leveling",
+                icon: '📏',
+                title: "Leveling Equipment: Graders",
+                subtitle: "Achieving Precision and Smoothness",
+                introduction: "The primary equipment for leveling is the Motor Grader. It is used for fine grading, shaping, and finishing surfaces to precise elevations and slopes. Essential for road construction, site preparation, and maintenance of unpaved roads.",
+                types: [
+                     { name: "Motor Grader", content: "Function: Fine grading, shaping, and finishing surfaces to precise elevations and slopes. Key Components: Long blade located between front and rear axles, moldboard can be angled and tilted. Applications: Creating flat or sloped surfaces for roads, foundations, drainage ditches; spreading material; snow removal. Key Role: Essential for road construction (subgrade, base, finish grading), site preparation, and maintenance of unpaved roads." }
+                ]
+            },
+            {
+                id: "paving",
+                navTitle: "Paving",
+                icon: '🛣️',
+                title: "Paving Equipment",
+                subtitle: "Constructing Durable Surfaces",
+                introduction: "Specialized machinery for laying and finishing pavement materials like asphalt and concrete. Goal: To create smooth, durable, and long-lasting surfaces for roads, highways, airports, and parking lots.",
+                types: [
+                    { name: "Binder Spreader", content: "Function: Applies uniform layer of bituminous binder (asphalt emulsion, cutback asphalt). Importance: Binder acts as adhesive (tack/prime coat) to bond pavement layers or seal surface. Mechanism: Truck-mounted unit with spray bar/nozzles. Applications: Road construction/maintenance." },
+                    { name: "Heating Kettle for Binder", content: "Function: Heats bituminous binder (asphalt cement, tar) to application temperature. Importance: Proper temperature for spraying, penetration, adhesion. Features: Insulated tank, heating system, temperature controls. Applications: With binder spreaders, crack sealing, asphalt maintenance." },
+                    { name: "Aggregate Spreader", content: "Function: Distributes uniform layer of aggregates (crushed stone, gravel, sand). Types: Tailgate Spreaders (on dump trucks), Self-Propelled Spreaders (precise control), Hopper Spreaders (small applications). Applications: Base course, surface treatments (chip seals), shoulder construction." },
+                    { name: "Cement Concrete Mixers", content: "Function: Combine cement, aggregates, water, admixtures for concrete. Types: Drum Mixers (batch, stationary/portable), Transit Mixers (truck mixers, mix en route/at site), Continuous Mixers. Applications: Supplying concrete for all construction." },
+                    { name: "Bituminous Paver (Asphalt Paver / Finisher)", content: "Function: Lays hot mix asphalt (HMA). Operation: Receives asphalt, conveys to rear, spreads to width/thickness with heated, vibrating screed. Components: Tractor, hopper, conveyors, augers, screed. Result: Smooth, uniform asphalt mat for compaction." },
+                    { name: "Cement Concrete Paver (Slipform Paver)", content: "Function: Places, consolidates, finishes Portland Cement Concrete (PCC) continuously. Slipform Process: Paver moves, concrete 'slipped' through forms shaping slab (no fixed side forms). Features: Can place reinforcing steel, dowel bars, tie bars. Applications: Concrete highways, airport runways, canals, barrier walls." }
+                ]
+            },
+            {
+                id: "lifting",
+                navTitle: "Lifting",
+                icon: '🏗️',
+                title: "Lifting Equipment",
+                subtitle: "Hoisting Materials and Components",
+                introduction: "Used for lifting, moving, and placing heavy materials and components at construction sites. Essential for vertical construction, assembly of structures, and material handling.",
+                types: [
+                    { name: "Backhoes (Backhoe Loaders)", content: "Versatility: Combines loader (front bucket) and excavator (rear digging arm/hoe). Lifting (Low Load): Backhoe arm for light lifting (pipes, small components). Front loader for material handling. Features: Highly mobile (wheeled), compact. Applications: Trenching, excavating, loading, light demolition, utility work, small lifting tasks." },
+                    {
+                        name: "Cranes",
+                        summary: "Designed for lifting and moving heavy materials over significant heights and distances using a hoist, wire ropes/chains, and sheaves.",
+                        variants: [
+                            { title: "Mobile Cranes", content: "Wheeled or crawler-mounted. Versatile, can move around site. Subtypes: All-terrain, rough-terrain, truck-mounted." },
+                            { title: "Tower Cranes", content: "Fixed cranes used for constructing tall buildings." },
+                            { title: "Crawler Cranes", content: "Heavy-duty, move on tracks, excellent stability for very heavy lifts." },
+                            { title: "Gantry Cranes, Overhead Cranes", content: "Used in industrial settings and precast yards." }
+                        ],
+                        capacityNote: "Capacity varies widely from a few tons to thousands of tons."
+                    }
+                ]
+            },
+            {
+                id: "transporting",
+                navTitle: "Transporting",
+                icon: '🚚',
+                title: "Transporting Equipment",
+                subtitle: "Moving Materials Efficiently",
+                introduction: "Facilitates the movement of materials, spoil, and equipment within the construction site and to/from external locations. Crucial for project logistics, maintaining workflow, and managing resources.",
+                types: [
+                    { name: "Dumping Trucks (Dump Trucks / Tipper Trucks)", content: "Function: Hauling loose materials (sand, gravel, soil, aggregates, demolition waste). Mechanism: Open-box bed, hinged at rear, hydraulic rams to lift front for dumping. Types: Standard, Articulated (ADTs for rough terrain), Side dump. Capacity: Varies (small utility to large off-highway mining)." },
+                    { name: "Trucks (General Haulage)", content: "Broad Category: Various trucks for diverse materials, equipment, personnel. Examples: Flatbed (oversized loads, equipment), Box (enclosed cargo), Water (dust control/supply), Fuel (refueling). Importance: Integral to site logistics and supply chain." },
+                    { name: "Mini Dumpers (Site Dumpers / Power Buggies)", content: "Function: Small, compact for short-distance material transport on sites, especially restricted access. Features: Wheeled, front-tipping skip. Some tracked. Capacity: Smaller (1-10 tons). Applications: Landscaping, small building projects, tight space material movement." }
+                ]
+            },
+            {
+                id: "plants",
+                navTitle: "Processing Plants",
+                icon: '🏭',
+                title: "Processing Plants",
+                subtitle: "Producing Essential Construction Materials",
+                introduction: "Stationary or semi-mobile facilities designed to produce various construction materials by processing raw inputs. Ensures a consistent supply of quality-controlled materials.",
+                types: [
+                    { name: "Cement Concrete Batching Plant", content: "Function: Combines precise amounts of cement, aggregates, water, admixtures for ready-mix concrete. Components: Aggregate bins, cement silos, water tanks, admixture dispensers, conveyors, mixer, control system. Types: Dry Batch (ingredients to truck mixer), Wet Batch (Central Mix - mixed in central mixer). Output: High-quality concrete." },
+                    { name: "Asphalt Concrete Mixing Plant (Asphalt Plant)", content: "Function: Produces hot mix asphalt (HMA) by heating/blending aggregates with asphalt binder. Components: Aggregate feeders, drying drum, burner, mixing unit, bitumen tanks, emission controls. Types: Batch Plants (discrete batches), Drum Mix Plants (continuous). Output: HMA for paving." },
+                    { name: "Cold Premix Mixing Plant", content: "Function: Produces cold mix asphalt/bituminous mixes without significant aggregate heating. Process: Mixes aggregates with emulsified/cutback asphalt at ambient temps. Advantages: Lower energy, reduced emissions, for remote/small jobs. Applications: Patching, temporary paving, rural roads, base stabilization." },
+                    { name: "Aggregate Crusher Plant", content: "Function: Reduces large rocks/quarry stones to smaller, graded aggregates. Components: Crushers (Jaw, Cone, Impact, Gyratory), Feeders, Screens, Conveyors. Process: Multiple crushing/screening stages. Output: Various sized crushed stone for concrete, asphalt, road base." },
+                    { name: "Screening Plant", content: "Function: Separates aggregates, rock, soil into different sizes (grades). Mechanism: Vibrating screens with different mesh sizes. Integration: Part of crushing operation or standalone. Output: Uniformly sized materials." },
+                    { name: "Washing Plant (Aggregate Washing Plant)", content: "Function: Cleans aggregates (sand, gravel, crushed stone) by removing deleterious materials (clay, silt, dust, organics). Importance: Clean aggregates for quality concrete/asphalt. Process: Washing, scrubbing, rinsing with water. May include log washers, screw classifiers, dewatering screens. Output: Clean, graded aggregates." },
+                    { name: "Sand Blowing Plant", content: "Function: Can refer to: Pneumatic Conveying Systems (transporting dry sand via air pressure), General Sand Processing Plants (drying, screening, classifying), or Sandblasting Media Production. Key Aspect: Emphasizes movement or specialized processing of sand." }
+                ]
+            },
+            {
+                id: "conclusion",
+                navTitle: "Conclusion & Resources",
+                icon: '📚',
+                title: "Summary & Future Trends",
+                content: `
+                    <div class="space-y-4">
+                        <p><strong>Diverse & Specialized:</strong> Construction equipment encompasses a vast array of machines tailored for specific tasks.</p>
+                        <p><strong>Efficiency & Productivity:</strong> Modern equipment significantly enhances project speed, quality, and cost-effectiveness.</p>
+                        <p><strong>Safety:</strong> Advances in equipment design and operation improve worksite safety.</p>
+                        <h3 class="text-xl font-semibold text-teal-700 mt-6">Future Trends:</h3>
+                        <ul class="list-disc list-inside space-y-1 pl-4">
+                            <li><strong>Automation & Robotics:</strong> Increasing use of autonomous and semi-autonomous machines.</li>
+                            <li><strong>Telematics & IoT:</strong> Data-driven fleet management, predictive maintenance.</li>
+                            <li><strong>Sustainability:</strong> Electric and hybrid equipment, alternative fuels, reduced emissions.</li>
+                            <li><strong>Advanced Materials & Designs:</strong> Lighter, stronger, more durable equipment.</li>
+                        </ul>
+                        <h3 class="text-xl font-semibold text-teal-700 mt-8">References & Further Reading:</h3>
+                        <ul class="list-disc list-inside space-y-1 pl-4 text-sm">
+                            <li><strong>Textbooks:</strong> "Construction Equipment and Methods" (e.g., by Peurifoy, Schexnayder, Shapira); "Moving the Earth: The Workbook of Excavation" (e.g., by Herbert L. Nichols Jr., David A. Day)</li>
+                            <li><strong>Industry Associations & Publications:</strong> Association of Equipment Manufacturers (AEM); Construction Equipment Magazine; Equipment World Magazine</li>
+                            <li><strong>Manufacturer Websites:</strong> (e.g., Caterpillar, Komatsu, Volvo CE, John Deere, Liebherr, etc.)</li>
+                            <li><strong>Academic Journals & Conference Proceedings:</strong> (Search for specific equipment or construction methods)</li>
+                        </ul>
+                    </div>
+                `
+            }
+        ];
+
+        const navigationMenu = document.getElementById('navigationMenu');
+        const contentArea = document.getElementById('contentArea');
+        const sidebar = document.getElementById('sidebar');
+        const mobileMenuButton = document.getElementById('mobileMenuButton');
+
+        function createAccordionItem(item, index, parentId) {
+            const accId = `${parentId}-acc-${index}`;
+            let contentHtml = '';
+            if (item.content) {
+                contentHtml = `<p class="text-sm text-neutral-700">${item.content}</p>`;
+            }
+            if (item.variants) {
+                contentHtml += '<ul class="mt-2 space-y-1 pl-4">';
+                item.variants.forEach(variant => {
+                    contentHtml += `<li class="text-sm"><strong class="text-neutral-600">${variant.title}:</strong> ${variant.content}</li>`;
+                });
+                contentHtml += '</ul>';
+            }
+            if (item.capacityNote) {
+                contentHtml += `<p class="mt-2 text-xs text-neutral-500 italic">${item.capacityNote}</p>`;
+            }
+
+            return `
+                <div class="equipment-card bg-white shadow-md rounded-lg overflow-hidden">
+                    <button class="w-full text-left p-4 hover:bg-stone-100 focus:outline-none flex justify-between items-center" onclick="toggleAccordionItem('${accId}-details')">
+                        <h4 class="text-lg font-semibold text-teal-700">${item.name} ${item.icon || ''}</h4>
+                        <svg id="${accId}-arrow" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-5 h-5 transition-transform transform">
+                            <path stroke-linecap="round" stroke-linejoin="round" d="m19.5 8.25-7.5 7.5-7.5-7.5" />
+                        </svg>
+                    </button>
+                    <div id="${accId}-details" class="equipment-details px-4">
+                        ${item.summary ? `<p class="mb-2 text-sm text-neutral-700">${item.summary}</p>` : ''}
+                        ${contentHtml}
+                    </div>
+                </div>
+            `;
+        }
+        
+        window.toggleAccordionItem = (detailsId) => {
+            const detailsElement = document.getElementById(detailsId);
+            const arrowElement = document.getElementById(detailsId.replace('-details', '-arrow'));
+            if (detailsElement) {
+                detailsElement.classList.toggle('open');
+                arrowElement.classList.toggle('rotate-180');
+            }
+        }
+
+        function renderContent(sectionId) {
+            const sectionData = equipmentData.find(s => s.id === sectionId);
+            if (!sectionData) {
+                contentArea.innerHTML = '<p>Content not found.</p>';
+                return;
+            }
+
+            let html = `<div id="${sectionData.id}" class="content-section active space-y-6">`;
+            html += `<h2 class="text-3xl md:text-4xl font-bold text-neutral-800 border-b-2 border-teal-500 pb-2">${sectionData.title}</h2>`;
+
+            if (sectionData.subtitle) {
+                html += `<p class="text-lg text-neutral-600 italic">${sectionData.subtitle}</p>`;
+            }
+            if (sectionData.introduction) {
+                html += `<p class="text-md leading-relaxed">${sectionData.introduction}</p>`;
+            }
+            if (sectionData.content) { // For Overview and Conclusion
+                html += sectionData.content;
+            }
+
+            if (sectionData.types) {
+                html += '<div class="space-y-4 mt-6">';
+                sectionData.types.forEach((type, index) => {
+                    html += createAccordionItem(type, index, sectionData.id);
+                });
+                html += '</div>';
+            }
+            html += '</div>';
+            contentArea.innerHTML = html;
+
+            // Update active link in sidebar
+            document.querySelectorAll('#navigationMenu a').forEach(link => {
+                link.classList.remove('bg-slate-700', 'text-white', 'font-semibold');
+                link.classList.add('hover:bg-slate-700', 'hover:text-white');
+                if (link.dataset.sectionId === sectionId) {
+                    link.classList.add('bg-slate-700', 'text-white', 'font-semibold');
+                    link.classList.remove('hover:bg-slate-700', 'hover:text-white');
+                }
+            });
+            
+            // Close sidebar on mobile after navigation
+            if (window.innerWidth < 768) { // md breakpoint
+                sidebar.classList.add('-translate-x-full');
+            }
+        }
+
+        equipmentData.forEach(section => {
+            const link = document.createElement('a');
+            link.href = '#';
+            link.dataset.sectionId = section.id;
+            link.className = 'flex items-center space-x-3 px-4 py-3 rounded-md text-stone-200 hover:bg-slate-700 hover:text-white transition-colors duration-150';
+            link.innerHTML = `<span class="sidebar-icon">${section.icon || '🔹'}</span><span>${section.navTitle}</span>`;
+            link.onclick = (e) => {
+                e.preventDefault();
+                renderContent(section.id);
+            };
+            navigationMenu.appendChild(link);
+        });
+        
+        mobileMenuButton.addEventListener('click', () => {
+            sidebar.classList.toggle('-translate-x-full');
+        });
+
+        // Initial render
+        if (equipmentData.length > 0) {
+            renderContent(equipmentData[0].id);
+        }
+    </script>
+</body>
+</html>
